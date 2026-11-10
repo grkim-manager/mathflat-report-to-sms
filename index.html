@@ -128,6 +128,24 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
 .chk{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13.5px;cursor:pointer;user-select:none}
 .chk input{accent-color:var(--brand);margin:0}
 .chk:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.mine{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);display:grid;gap:10px}
+.mine-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mine-head .lbl{font-size:13px;font-weight:600}
+.mine .hint{font-size:12.5px;color:var(--muted);margin:0}
+.pchip{max-width:100%}
+.pchip .pt{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pchip .pp{font-size:11px;color:var(--muted)}
+.pchip .ed{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:13px}
+.pchip .ed:hover{color:var(--brand)}
+.addp{border:1px dashed var(--brand);color:var(--brand);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13.5px;font-weight:600;cursor:pointer}
+.ph-edit{display:grid;gap:8px;background:var(--sunk);border-radius:12px;padding:14px}
+.ph-edit .lbl{font-size:13px;font-weight:600}
+.ph-vars{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.ph-vars button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:2px 8px;font-size:12.5px;cursor:pointer;color:var(--ink);font-family:var(--f-mono)}
+.ph-vars button:hover{border-color:var(--brand)}
+.ph-btns{display:flex;gap:8px;align-items:center}
+.ph-btns span{flex:1}
+#phDel{color:var(--weak)}
 
 /* preview */
 .phone{background:var(--phone);border-radius:34px;padding:10px;box-shadow:0 20px 40px -24px rgba(10,20,50,.45)}
@@ -237,6 +255,15 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
 .full summary{cursor:pointer;padding:12px 16px;font-size:15.5px;font-weight:600;color:var(--brand)}
 .full .shot-scroll{overflow-x:auto;background:#fff;border-top:1px solid var(--line)}
 .full img{display:block;width:100%;min-width:900px;height:auto}
+.tipst{background:var(--c-cnt)!important}
+.kk{display:inline-block;border:1.5px dashed var(--brand);color:var(--brand);border-radius:999px;padding:0 10px;font-weight:700;font-size:.92em;line-height:1.6;background:var(--surface)}
+.tipsec code,.ex code{font-family:var(--f-mono);font-size:.85em;background:var(--brand-soft);color:var(--brand);border-radius:5px;padding:1px 5px}
+.ex-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ex{background:var(--sunk);border-radius:12px;padding:14px 16px;display:grid;gap:8px;align-content:start;min-width:0}
+.ex-pos{justify-self:start;font-size:13px;font-weight:700;color:var(--brand);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.ex ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.ex li{font-size:15px;line-height:1.55;background:var(--surface);border-radius:9px;padding:8px 10px}
+@media (max-width:760px){.ex-grid{grid-template-columns:1fr}}
 .guide-foot{position:sticky;bottom:0;background:var(--surface);padding:14px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
 @media (max-width:920px){.guide-cta{max-width:420px}}
 @media (max-width:520px){.flow{grid-template-columns:1fr}.flow li:not(:last-child)::after{right:50%;top:auto;bottom:-9px;transform:translateX(50%) rotate(135deg)}.guide-head,.guide-body,.guide-foot{padding-inline:16px}}
@@ -261,6 +288,7 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+
 
 </head>
 <body>
@@ -344,7 +372,21 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
                 <label class="chk"><input type="checkbox" id="s-weak" data-s="weak">보완할 유형</label>
                 <label class="chk"><input type="checkbox" id="s-plan" data-s="plan">다음 달 계획</label>
                 <label class="chk"><input type="checkbox" id="s-note" data-s="note">선생님 한마디</label>
-              </div></div>
+              </div>
+              <div class="mine">
+                <div class="mine-head"><span class="lbl">내 문구</span><span class="hint">모든 학생 문자에 들어가요 · 이 브라우저에 저장돼요</span></div>
+                <div class="checks" id="phrases"></div>
+                <div class="ph-edit" id="phEdit" hidden>
+                  <label for="phText" class="lbl">문구</label>
+                  <textarea class="note" id="phText" rows="2" placeholder="예: {이름}가 {월}에도 정말 성실하게 따라와 줬어요."></textarea>
+                  <div class="ph-vars"><span>눌러서 넣기</span><button type="button" data-var="{이름}">{이름}</button><button type="button" data-var="{학생명}">{학생명}</button><button type="button" data-var="{월}">{월}</button><button type="button" data-var="{정답률}">{정답률}</button></div>
+                  <span class="lbl" id="l-ppos">들어갈 위치</span>
+                  <div class="segs" role="group" aria-labelledby="l-ppos" id="phPos"><button type="button" data-v="greet">인사말 아래</button><button type="button" data-v="end">본문 끝</button><button type="button" data-v="close">마지막 인사 대신</button></div>
+                  <p class="hint" id="phPreview"></p>
+                  <div class="ph-btns"><button type="button" class="btn" id="phDel" hidden>삭제</button><span></span><button type="button" class="btn" id="phCancel">취소</button><button type="button" class="btn pri" id="phSave">저장</button></div>
+                </div>
+              </div>
+            </div>
           </div>
         </details>
       </div>
@@ -364,17 +406,15 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
       <div class="dirty" id="dirty" hidden><span>직접 고친 문자예요. 바뀐 설정으로 새로 만들까요?</span><button type="button" id="regenDirty">새로 만들기</button></div>
       <div class="tools">
         <div class="bytes"><span id="bytes">0 byte</span><span class="pill" id="kind">LMS</span></div>
-        <button type="button" class="btn" id="variant" title="같은 내용을 다른 표현으로 다시 써요"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>다른 표현</button>
         <button type="button" class="btn" id="copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>문자 복사하기</button>
         <button type="button" class="btn pri" id="toPhone"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>휴대폰으로 보내기</button>
       </div>
       <details class="more" id="more">
         <summary>PC에서 보내는 다른 방법</summary>
         <ul>
-          <li><b>웹문자·학원관리 프로그램</b>을 쓰신다면 '문자 복사하기' 후 발송 창에 바로 붙여넣으세요.</li>
+          <li><b>웹문자·학원관리 프로그램이나 PC 카카오톡</b>으로 보내신다면 '문자 복사하기' 후 발송 창이나 대화창에 바로 붙여넣으세요.</li>
           <li><b>갤럭시</b>는 윈도우 'Phone Link(휴대폰과 연결)'로 PC에서 문자를 보내거나, 복사한 내용을 휴대폰에서 붙여넣을 수 있어요.</li>
           <li><b>아이폰</b>은 맥의 메시지 앱에서 바로 보내거나, 유니버설 클립보드로 맥에서 복사해 아이폰에 붙여넣을 수 있어요.</li>
-          <li><b>카카오톡 '나와의 채팅'</b>에 붙여넣어 두면 휴대폰에서 꺼내 복사하기 편해요.</li>
         </ul>
       </details>
     </section>
@@ -424,6 +464,7 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
             <ul class="ways">
               <li><b>직접 고치기</b> 휴대폰 화면 속 문자를 누르면 글자를 바로 고칠 수 있어요.</li>
               <li><b>설정으로 바꾸기</b> 문자 설정 아래 <span class="k">세부 설정</span>을 누르면 호칭, 말투, 형식, 분량, 넣을 내용을 고를 수 있어요. 고르는 즉시 문자가 새로 만들어져요.</li>
+              <li><b>내 문구 저장하기</b> 세부 설정의 <span class="k">+ 내 문구 추가</span>로 자주 쓰는 멘트를 저장해 두면, 다음에 들어와도 모든 학생 문자에 자동으로 들어가요. {이름}을 넣으면 학생마다 이름이 바뀌어 들어가요.</li>
             </ul>
             <span class="note">문자를 직접 고친 뒤에 설정을 바꾸면, 고친 내용을 지우기 전에 새로 만들지 먼저 물어봐요.</span>
           </li>
@@ -431,7 +472,38 @@ input[type=text]:focus,textarea.note:focus{border-color:var(--brand);outline:non
           <li class="hl"><b>③</b> QR 창에서 <b>학부모님 번호를 먼저 입력</b>해요. 번호를 넣으면 QR에 받는 사람까지 담겨요.</li>
           <li><b>④</b> 휴대폰 기본 카메라로 QR을 찍고, 뜨는 알림을 눌러요. 받는 사람과 문자가 채워진 문자창이 열리면 전송하면 끝이에요.</li>
         </ol>
-        <p class="tip">번호를 입력하지 않으면 문자창에서 받는 사람을 직접 골라야 해요. 웹문자나 학원 관리 프로그램을 쓰신다면 <b>문자 복사하기</b> 후 붙여넣으세요.</p>
+        <p class="tip">번호를 입력하지 않으면 문자창에서 받는 사람을 직접 골라야 해요. 웹문자·학원관리 프로그램이나 PC 카카오톡으로 보내신다면 <b>문자 복사하기</b> 후 바로 붙여넣으세요.</p>
+      </section>
+
+      <section class="gstep tipsec">
+        <h4><span class="st tipst">TIP</span>이런 내 문구를 저장해 보세요</h4>
+        <p>세부 설정의 <span class="kk">+ 내 문구 추가</span>로 한 번 저장해 두면 매달 모든 학생 문자에 자동으로 들어가요. <code>{이름}</code>은 학생마다 "하늘이", "정희"처럼 바뀌어 들어가요.</p>
+        <div class="ex-grid">
+          <div class="ex">
+            <span class="ex-pos">인사말 아래</span>
+            <ul>
+              <li>늘 믿고 맡겨주셔서 감사합니다.</li>
+              <li><code>{월}</code>에도 <code>{이름}</code>가 수업에 성실하게 참여했습니다.</li>
+              <li>시험 대비로 바쁜 한 달이었는데, <code>{이름}</code>가 끝까지 잘 따라와 주었습니다.</li>
+            </ul>
+          </div>
+          <div class="ex">
+            <span class="ex-pos">본문 끝</span>
+            <ul>
+              <li>결석 시 보강은 주중 오후 2~5시에 가능합니다.</li>
+              <li>이번 달부터 토요일 오전 보충반을 운영하고 있습니다.</li>
+              <li>상담은 평일 오후 1~3시에 편하게 연락 주세요.</li>
+            </ul>
+          </div>
+          <div class="ex">
+            <span class="ex-pos">마지막 인사 대신</span>
+            <ul>
+              <li>앞으로도 <code>{이름}</code>를 꼼꼼히 챙기겠습니다.<br>매쓰수학학원 원장 김매쓰 드림</li>
+              <li>다음 달에도 <code>{이름}</code>랑 즐겁게 공부할게요! 감사합니다 :)</li>
+              <li><code>{이름}</code>의 목표 점수까지 함께 달려가겠습니다. 감사합니다.</li>
+            </ul>
+          </div>
+        </div>
       </section>
     </div>
     <div class="guide-foot"><button type="button" class="btn pri" id="guideStart">보고서 올리러 가기</button></div>
@@ -582,9 +654,13 @@ function generate(d,o,seed){
     t(M+' 한 달 동안의 '+nick+' 학습 결과를 정리해 보내드립니다.',M+' 한 달 동안 '+nick+'가 어떻게 공부했는지 정리해서 보내드려요.'.replace(nick+'가',josa(nick,'이/가'))),
     t(M+' 매쓰플랫 학습 데이터를 바탕으로 '+nick+'의 학습 현황을 안내드립니다.',M+' 매쓰플랫 학습 데이터로 '+nick+' 학습 현황을 정리해 봤어요.')
   ]));
+  const accTxt=d.acc!=null?d.acc+'%':'';
+  const PH=(o.phrases||[]).filter(x=>x.on&&x.text&&x.text.trim());
+  const fill=x=>x.text.trim().replace(/\{이름\}/g,nick).replace(/\{학생명\}/g,d.name||'').replace(/\{월\}/g,M).replace(/\{정답률\}/g,accTxt).replace(/\{학원명\}/g,o.academy||'');
+  PH.filter(x=>x.pos==='greet').forEach(x=>out.push(fill(x)));
   out.push('');
 
-  const accTxt=d.acc!=null?d.acc+'%':'';const gTxt=d.grade!=null?'정답률 기준 '+d.grade+'등급':'';
+  const gTxt=d.grade!=null?'정답률 기준 '+d.grade+'등급':'';
   const nk=josa(nick,'은/는');
   // 섹션 빌더
   const sec={};
@@ -685,6 +761,10 @@ function generate(d,o,seed){
   else{const paras=[];let cur=[];
     blocks.forEach((b,i)=>{cur.push(...b);if(cur.length>=2||i===blocks.length-1){paras.push(cur.join(' '));cur=[];}});
     paras.forEach(p=>out.push(p,''));}
+  const endP=PH.filter(x=>x.pos==='end');
+  if(endP.length){endP.forEach(x=>out.push(fill(x)));out.push('');}
+  const closeP=PH.filter(x=>x.pos==='close');
+  if(closeP.length){out.push(closeP.map(fill).join('\n'));return {text:out.join('\n').replace(/\n{3,}/g,'\n\n'),seg};}
   const nkObj=josa(nick,'을/를');
   out.push((seed%2===1)
     ?t('앞으로도 '+nkObj+' 꼼꼼히 챙기겠습니다.\n감사합니다.','앞으로도 '+nkObj+' 꼼꼼히 챙길게요.\n감사합니다!')
@@ -701,8 +781,8 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LS='mf-sms-settings-v1';
 const settings={academy:'',teacher:'',honor:'학부모님',tone:'formal',format:'list',length:'long',typeName:'short',
-  sections:{summary:true,good:true,weak:true,plan:true,note:true}};
-try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s){Object.assign(settings,s,{sections:Object.assign({},settings.sections,s.sections||{})});}}catch(e){}
+  sections:{summary:true,good:true,weak:true,plan:true,note:true},phrases:[]};
+try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s){Object.assign(settings,s,{sections:Object.assign({},settings.sections,s.sections||{}),phrases:Array.isArray(s.phrases)?s.phrases:[]});}}catch(e){}
 const save=()=>{try{localStorage.setItem(LS,JSON.stringify(settings));}catch(e){}};
 
 let uid=0;
@@ -753,6 +833,12 @@ function renderSettings(){
   document.querySelectorAll('#checks input').forEach(c=>c.checked=!!settings.sections[c.dataset.s]);
   $('#advSum').textContent=[settings.honor,settings.tone==='friendly'?'친근하게':'정중하게',settings.format==='prose'?'문장형':'항목형',settings.length==='short'?'핵심만':'자세히'].join(' · ');
   $('#note').value=st.note;$('#noteWho').textContent=st.data.name+' 학생';
+  renderPhrases();
+}
+const POS_LABEL={greet:'인사말 아래',end:'본문 끝',close:'마지막 인사 대신'};
+function renderPhrases(){
+  $('#phrases').innerHTML=settings.phrases.map(p=>`<span class="chk pchip"><input type="checkbox" data-p="${p.id}" id="p-${p.id}" ${p.on?'checked':''} aria-label="${esc(p.text)}"><label for="p-${p.id}" class="pt" title="${esc(p.text)}">${esc(p.text)}</label><span class="pp">${POS_LABEL[p.pos]||''}</span><button type="button" class="ed" data-edit="${p.id}" aria-label="문구 수정">✎</button></span>`).join('')+
+    `<button type="button" class="addp" id="addPhrase">+ 내 문구 추가</button>`;
 }
 function autosize(){const t=$('#sms');t.style.height='auto';t.style.height=(t.scrollHeight+4)+'px';}
 function renderPreview(){
@@ -798,11 +884,31 @@ $('#checks').addEventListener('change',e=>{const c=e.target;if(c.dataset.s){sett
 {let tm;$('#note').addEventListener('input',e=>{const st=cur();st.note=e.target.value;clearTimeout(tm);
   tm=setTimeout(()=>{if(st.dirty)st.stale=true;else if(settings.sections.note)regen(st);renderStudents();renderPreview();},250);});}
 $('#sms').addEventListener('input',e=>{const st=cur();st.text=e.target.value;st.dirty=true;autosize();updateBytes();});
-$('#variant').addEventListener('click',()=>{
-  const st=cur();
-  const go=()=>{st.seed++;regen(st);pending=null;renderPreview();toast('다른 표현으로 바꿨어요');};
-  if(st.dirty){pending={msg:'다른 표현으로 바꾸면 직접 고친 내용이 사라져요.',btn:'바꾸기',run:go};renderDirty();}else go();
+
+/* ---------- 내 문구 ---------- */
+let phEditing=null,phPos='end';
+function phPreview(){const st=cur();const txt=$('#phText').value.trim();
+  $('#phPreview').textContent=txt?('미리보기: '+txt.replace(/\{이름\}/g,nickOf(st.data.name)).replace(/\{학생명\}/g,st.data.name).replace(/\{월\}/g,st.data.month?st.data.month+'월':'이번 달').replace(/\{정답률\}/g,st.data.acc!=null?st.data.acc+'%':'')):'';}
+function phSetPos(v){phPos=v;$('#phPos').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));}
+function openPh(id){phEditing=id;const p=settings.phrases.find(x=>x.id===id);
+  $('#phText').value=p?p.text:'';phSetPos(p?p.pos:'end');$('#phDel').hidden=!p;$('#phEdit').hidden=false;phPreview();$('#phText').focus();}
+function closePh(){$('#phEdit').hidden=true;phEditing=null;}
+$('#phrases').addEventListener('click',e=>{
+  if(e.target.closest('#addPhrase')){openPh(null);return;}
+  const ed=e.target.closest('[data-edit]');if(ed){openPh(ed.dataset.edit);}
 });
+$('#phrases').addEventListener('change',e=>{const c=e.target;if(c.dataset.p){const p=settings.phrases.find(x=>x.id===c.dataset.p);if(p){p.on=c.checked;settingsChanged();}}});
+$('#phPos').addEventListener('click',e=>{const b=e.target.closest('button');if(b)phSetPos(b.dataset.v);});
+document.querySelector('.ph-vars').addEventListener('click',e=>{const b=e.target.closest('[data-var]');if(!b)return;const t=$('#phText');const a=t.selectionStart??t.value.length,z=t.selectionEnd??t.value.length;
+  t.value=t.value.slice(0,a)+b.dataset.var+t.value.slice(z);t.focus();t.selectionStart=t.selectionEnd=a+b.dataset.var.length;phPreview();});
+$('#phText').addEventListener('input',phPreview);
+$('#phCancel').addEventListener('click',closePh);
+$('#phDel').addEventListener('click',()=>{settings.phrases=settings.phrases.filter(x=>x.id!==phEditing);closePh();settingsChanged();toast('내 문구를 삭제했어요');});
+$('#phSave').addEventListener('click',()=>{const txt=$('#phText').value.trim();if(!txt){$('#phText').focus();return;}
+  const p=settings.phrases.find(x=>x.id===phEditing);
+  if(p){p.text=txt;p.pos=phPos;}else settings.phrases.push({id:'p'+Date.now().toString(36),text:txt,pos:phPos,on:true});
+  closePh();settingsChanged();toast('내 문구를 저장했어요. 다음에 와도 그대로 있어요');});
+
 $('#regenDirty').addEventListener('click',()=>{const st=cur();if(pending){pending.run();return;}regen(st);renderPreview();});
 $('#copy').addEventListener('click',()=>{
   const v=$('#sms').value;
@@ -901,6 +1007,7 @@ setTimeout(autosize,600);setTimeout(autosize,2000);
 })();
 
 </script>
+
 
 </body>
 </html>
